@@ -1,0 +1,17 @@
+{
+  "name": "quoter-backend",
+  "version": "1.0.0",
+  "description": "Backend API para Analizador Pro usando Azure Functions",
+  "main": "index.js",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.0.0",
+    "@azure/functions": "^4.0.0"
+  },
+  "devDependencies": {
+    "azure-functions-core-tools": "^4.0.0"
+  }
+}
