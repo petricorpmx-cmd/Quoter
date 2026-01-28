@@ -18,17 +18,21 @@ La API de Gemini muestra el mensaje:
 
 ### Paso 2: Configurar en Azure Static Web Apps
 
+**⚠️ IMPORTANTE**: NO vayas a la sección "API". Ve directamente a "Configuración".
+
 1. **Ve a Azure Portal**: https://portal.azure.com
 2. **Busca tu Static Web App** → Selecciónala
-3. Ve a **"Configuration"** (en el menú izquierdo)
-4. Pestaña **"Application settings"**
-5. Haz clic en **"+ Add"**
+3. En el menú izquierdo, busca **"Configuración"** (Configuration) - NO "API"
+4. Pestaña **"Application settings"** o **"Variables de entorno"**
+5. Haz clic en **"+ Add"** o **"+ Agregar"**
 6. Agrega:
    - **Name**: `VITE_GEMINI_API_KEY`
    - **Value**: Tu API key de Gemini (ej: `AIzaSy...`)
 7. Haz clic en **"OK"**
-8. Haz clic en **"Save"** (arriba)
+8. Haz clic en **"Save"** o **"Guardar"** (arriba)
 9. Espera unos segundos mientras se reinicia la aplicación
+
+**Nota**: Si ves un mensaje sobre "Bring Your Own API" en la sección "API", ignóralo. Eso es para APIs externas, no para variables de entorno. Gemini funciona directamente desde el frontend, no necesita backend.
 
 ### Paso 3: Verificar
 
