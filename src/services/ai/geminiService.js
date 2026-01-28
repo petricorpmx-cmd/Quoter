@@ -11,9 +11,12 @@ export const callGeminiAI = async (userPrompt, contextData, ivaRate) => {
   console.log('🔍 Debug Gemini API Key:', {
     desdeDefine: typeof __gemini_api_key !== 'undefined',
     valorDefine: apiKeyFromDefine ? `${apiKeyFromDefine.substring(0, 10)}...` : 'VACÍA',
+    longitudDefine: apiKeyFromDefine ? apiKeyFromDefine.length : 0,
     desdeEnv: !!import.meta.env.VITE_GEMINI_API_KEY,
     valorEnv: apiKeyFromEnv ? `${apiKeyFromEnv.substring(0, 10)}...` : 'VACÍA',
+    longitudEnv: apiKeyFromEnv ? apiKeyFromEnv.length : 0,
     apiKeyFinal: apiKey ? `${apiKey.substring(0, 10)}...` : 'VACÍA',
+    longitudFinal: apiKey ? apiKey.length : 0,
     modo: import.meta.env.MODE,
     todasLasEnv: Object.keys(import.meta.env).filter(k => k.includes('GEMINI') || k.includes('VITE'))
   });
@@ -21,7 +24,8 @@ export const callGeminiAI = async (userPrompt, contextData, ivaRate) => {
   // Si no hay API key, retornar mensaje informativo
   if (!apiKey || apiKey.trim() === '') {
     console.error('❌ Gemini API Key no encontrada:', {
-      __gemini_api_key: typeof __gemini_api_key !== 'undefined' ? 'DEFINIDA' : 'NO DEFINIDA',
+      __gemini_api_key: typeof __gemini_api_key !== 'undefined' ? `DEFINIDA (longitud: ${apiKeyFromDefine.length})` : 'NO DEFINIDA',
+      valorRaw: typeof __gemini_api_key !== 'undefined' ? `"${apiKeyFromDefine}"` : 'undefined',
       VITE_GEMINI_API_KEY: import.meta.env.VITE_GEMINI_API_KEY ? 'DEFINIDA' : 'NO DEFINIDA',
       todasLasVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_'))
     });
