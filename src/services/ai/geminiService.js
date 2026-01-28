@@ -3,10 +3,20 @@ export const callGeminiAI = async (userPrompt, contextData, ivaRate) => {
   // @ts-ignore - Variable global definida en vite.config.js o .env
   const apiKey = typeof __gemini_api_key !== 'undefined' ? __gemini_api_key : '';
   
+  // Debug: Verificar qué valor tiene la variable (solo en desarrollo)
+  if (import.meta.env.DEV) {
+    console.log('🔍 Debug Gemini API Key:', {
+      existe: typeof __gemini_api_key !== 'undefined',
+      valor: apiKey ? `${apiKey.substring(0, 10)}...` : 'VACÍA',
+      desdeEnv: import.meta.env.VITE_GEMINI_API_KEY ? `${import.meta.env.VITE_GEMINI_API_KEY.substring(0, 10)}...` : 'NO ENCONTRADA'
+    });
+  }
+  
   // Si no hay API key, retornar mensaje informativo
   if (!apiKey || apiKey.trim() === '') {
+    console.warn('⚠️ Gemini API Key no configurada. Verifica que VITE_GEMINI_API_KEY esté en Azure Static Web Apps → Configuration → Application settings');
     return { 
-      text: "⚠️ El asistente de IA requiere una API key de Gemini para funcionar. Por favor, configura tu API key en el archivo de configuración. Mientras tanto, puedes usar todas las demás funciones de la aplicación para analizar y comparar proveedores.", 
+      text: "⚠️ El asistente de IA requiere una API key de Gemini para funcionar. Por favor, configura tu API key en Azure Portal (Static Web App → Configuration → Application settings → VITE_GEMINI_API_KEY). Después de agregarla, necesitas hacer un nuevo deployment. Mientras tanto, puedes usar todas las demás funciones de la aplicación para analizar y comparar proveedores.", 
       sources: [] 
     };
   }
