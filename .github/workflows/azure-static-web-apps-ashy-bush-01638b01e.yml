@@ -63,6 +63,7 @@ jobs:
           output_location: "dist" # Built app content directory - optional
           github_id_token: ${{ steps.idtoken.outputs.result }}
           skip_app_build: true # Ya hicimos el build arriba
+          app_build_command: "echo 'Build already done'" # Evitar que intente hacer build de nuevo
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
