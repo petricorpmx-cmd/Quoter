@@ -38,6 +38,17 @@ jobs:
           node-version: '18'
       - name: Install dependencies
         run: npm ci
+      - name: Verify environment variables
+        run: |
+          echo "Verificando variables de entorno..."
+          if [ -n "$VITE_GEMINI_API_KEY" ]; then
+            echo "✅ VITE_GEMINI_API_KEY está definida (longitud: ${#VITE_GEMINI_API_KEY})"
+            echo "Primeros 10 caracteres: ${VITE_GEMINI_API_KEY:0:10}..."
+          else
+            echo "❌ VITE_GEMINI_API_KEY NO está definida"
+          fi
+        env:
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY || 'AIzaSyCoijrYhBHXCEPu1sofVjXl8YuzFC8txyM' }}
       - name: Build with environment variables
         run: npm run build
         env:
