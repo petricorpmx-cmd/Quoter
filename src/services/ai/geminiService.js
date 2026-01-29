@@ -1,11 +1,21 @@
 export const callGeminiAI = async (userPrompt, contextData, ivaRate) => {
   // Intentar obtener la API key de múltiples fuentes
   // @ts-ignore - Variable global definida en vite.config.js
-  const apiKeyFromDefine = typeof __gemini_api_key !== 'undefined' ? __gemini_api_key : '';
+  let apiKeyFromDefine = typeof __gemini_api_key !== 'undefined' ? __gemini_api_key : '';
+  // Si está vacía o es solo comillas, intentar parsear
+  if (apiKeyFromDefine && (apiKeyFromDefine === '""' || apiKeyFromDefine.trim() === '')) {
+    apiKeyFromDefine = '';
+  }
+  
   // También intentar desde import.meta.env (fallback)
-  const apiKeyFromEnv = import.meta.env.VITE_GEMINI_API_KEY || '';
+  let apiKeyFromEnv = import.meta.env.VITE_GEMINI_API_KEY || '';
+  
+  // Intentar desde window (Azure Portal puede inyectar variables aquí)
+  // @ts-ignore
+  const apiKeyFromWindow = typeof window !== 'undefined' && window.VITE_GEMINI_API_KEY ? window.VITE_GEMINI_API_KEY : '';
+  
   // Usar la primera que tenga valor
-  const apiKey = apiKeyFromDefine || apiKeyFromEnv;
+  const apiKey = apiKeyFromDefine || apiKeyFromEnv || apiKeyFromWindow;
   
   // Debug completo (siempre, para producción también)
   console.log('🔍 Debug Gemini API Key:', {
