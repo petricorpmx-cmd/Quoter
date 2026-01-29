@@ -60,18 +60,16 @@ export const callGeminiAI = async (userPrompt, contextData, ivaRate) => {
   const model = "gemini-1.5-flash";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
+  // Construir el prompt con contexto
+  const systemPrompt = `Eres un analista de compras experto. Datos: ${JSON.stringify(contextData)}. Tasa IVA: ${ivaRate}%. Ayuda al usuario con comparativas y ahorro.`;
+  const fullPrompt = `${systemPrompt}\n\nUsuario: ${userPrompt}`;
+
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: String(userPrompt) }] }],
-        systemInstruction: { 
-          parts: [{ 
-            text: `Eres un analista de compras experto. Datos: ${JSON.stringify(contextData)}. Tasa IVA: ${ivaRate}%. Ayuda al usuario con comparativas y ahorro.` 
-          }] 
-        },
-        tools: [{ "google_search": {} }]
+        contents: [{ parts: [{ text: fullPrompt }] }]
       })
     });
 

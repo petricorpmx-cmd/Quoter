@@ -50,7 +50,18 @@ jobs:
         env:
           VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY || 'AIzaSyCoijrYhBHXCEPu1sofVjXl8YuzFC8txyM' }}
       - name: Build with environment variables
-        run: npm run build
+        run: |
+          echo "🔨 Iniciando build..."
+          echo "API Key que se usará (primeros 10): ${VITE_GEMINI_API_KEY:0:10}..."
+          npm run build
+          echo "✅ Build completado"
+          echo "Verificando API key en el build..."
+          # Buscar la API key en los archivos compilados (solo primeros 10 caracteres para seguridad)
+          if grep -r "AIzaSyCoij" dist/ 2>/dev/null | head -1; then
+            echo "✅ API key nueva encontrada en el build"
+          else
+            echo "⚠️ API key nueva NO encontrada en el build (puede estar usando una antigua)"
+          fi
         env:
           # Variables de entorno para el build (Vite las necesita durante el build)
           VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY || 'AIzaSyCoijrYhBHXCEPu1sofVjXl8YuzFC8txyM' }}
