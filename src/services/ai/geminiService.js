@@ -127,6 +127,13 @@ export const callGeminiAI = async (userPrompt, contextData, ivaRate) => {
       }
       if (response.status === 400) {
         console.error('❌ Error 400 - Detalles:', errorDetails);
+        // Mensaje más específico si la API key expiró
+        if (errorDetails && errorDetails.includes('expired')) {
+          return { 
+            text: "⚠️ La API key de Gemini ha expirado. Por favor, crea una nueva API key en Google AI Studio (https://aistudio.google.com/apikey) y actualízala en el workflow de GitHub Actions o en Azure Portal.", 
+            sources: [] 
+          };
+        }
         return { 
           text: `⚠️ Error en la solicitud a la API de Gemini (400). ${errorDetails ? `Detalles: ${errorDetails.substring(0, 200)}` : 'Por favor, intenta reformular tu pregunta o verifica que tengas datos de proveedores ingresados.'}`, 
           sources: [] 

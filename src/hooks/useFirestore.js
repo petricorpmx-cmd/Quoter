@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { subscribeToAppState, saveAppState } from '../services/firebase/firestoreService';
+// Usar Azure Functions en lugar de Firebase
+import { subscribeToAppState, saveAppState } from '../services/azure/appStateService';
 
 const DEFAULT_ITEMS = [{
   id: '1',

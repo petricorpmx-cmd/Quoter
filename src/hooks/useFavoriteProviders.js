@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+// Usar Azure Functions en lugar de Firebase
 import { 
   subscribeToFavoriteProviders, 
   saveFavoriteProvider, 
   deleteFavoriteProvider 
-} from '../services/firebase/favoriteProvidersService';
+} from '../services/azure/favoriteProvidersService';
 
 export const useFavoriteProviders = (user) => {
   const [favoriteProviders, setFavoriteProviders] = useState([]);
