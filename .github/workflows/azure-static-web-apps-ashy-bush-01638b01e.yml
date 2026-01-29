@@ -61,7 +61,8 @@ jobs:
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "/" # App source code path
           api_location: "" # Api source code path - optional
-          output_location: "dist" # Built app content directory - optional
+          output_location: "" # No usar output_location cuando usamos app_artifact_location
+          app_artifact_location: "dist" # Solo subir la carpeta dist ya construida
           github_id_token: ${{ steps.idtoken.outputs.result }}
           skip_app_build: true # Ya hicimos el build arriba
           ###### End of Repository/Build Configurations ######
