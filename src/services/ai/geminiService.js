@@ -60,18 +60,62 @@ export const callGeminiAI = async (userPrompt, contextData, ivaRate) => {
   const model = "gemini-1.5-flash";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-  // Construir el prompt con contexto
-  const systemPrompt = `Eres un analista de compras experto. Datos: ${JSON.stringify(contextData)}. Tasa IVA: ${ivaRate}%. Ayuda al usuario con comparativas y ahorro.`;
+  // Construir el prompt con contexto (limitar tamaño para evitar errores)
+  let contextText = '';
+  try {
+    if (contextData && Array.isArray(contextData) && contextData.length > 0) {
+      // Limitar a los primeros 3 items para evitar prompts muy largos
+      const limitedContext = contextData.slice(0, 3);
+      contextText = JSON.stringify(limitedContext);
+      // Limitar longitud del contexto a 2000 caracteres
+      if (contextText.length > 2000) {
+        contextText = contextText.substring(0, 2000) + '...';
+      }
+    }
+  } catch (e) {
+    console.warn('Error al preparar contexto:', e);
+  }
+
+  const systemPrompt = `Eres un analista de compras experto. ${contextText ? `Datos disponibles: ${contextText}. ` : ''}Tasa IVA: ${ivaRate}%. Ayuda al usuario con comparativas y ahorro.`;
   const fullPrompt = `${systemPrompt}\n\nUsuario: ${userPrompt}`;
 
+  // Limitar longitud total del prompt (máximo 8000 caracteres)
+  const finalPrompt = fullPrompt.length > 8000 ? fullPrompt.substring(0, 8000) + '...' : fullPrompt;
+
   try {
+    const requestBody = {
+      contents: [{ parts: [{ text: finalPrompt }] }]
+    };
+
+    console.log('📤 Enviando solicitud a Gemini:', {
+      modelo: model,
+      longitudPrompt: finalPrompt.length,
+      tieneContexto: !!contextText,
+      apiKeyUsada: apiKey ? `${apiKey.substring(0, 10)}...` : 'NINGUNA'
+    });
+
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: fullPrompt }] }]
-      })
+      body: JSON.stringify(requestBody)
     });
+
+    // Obtener detalles del error si hay
+    let errorDetails = '';
+    if (!response.ok) {
+      try {
+        const errorData = await response.json();
+        errorDetails = errorData.error?.message || JSON.stringify(errorData);
+        console.error('❌ Error de Gemini API:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+      } catch (e) {
+        errorDetails = await response.text();
+        console.error('❌ Error de Gemini API (texto):', errorDetails);
+      }
+    }
 
     // Verificar si la respuesta es exitosa
     if (!response.ok) {
@@ -82,12 +126,13 @@ export const callGeminiAI = async (userPrompt, contextData, ivaRate) => {
         };
       }
       if (response.status === 400) {
+        console.error('❌ Error 400 - Detalles:', errorDetails);
         return { 
-          text: "⚠️ Error en la solicitud a la API de Gemini. Por favor, intenta reformular tu pregunta.", 
+          text: `⚠️ Error en la solicitud a la API de Gemini (400). ${errorDetails ? `Detalles: ${errorDetails.substring(0, 200)}` : 'Por favor, intenta reformular tu pregunta o verifica que tengas datos de proveedores ingresados.'}`, 
           sources: [] 
         };
       }
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
     }
     
     const result = await response.json();
