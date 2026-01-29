@@ -2,9 +2,20 @@ export const callGeminiAI = async (userPrompt, contextData, ivaRate) => {
   // Intentar obtener la API key de múltiples fuentes
   // @ts-ignore - Variable global definida en vite.config.js
   let apiKeyFromDefine = typeof __gemini_api_key !== 'undefined' ? __gemini_api_key : '';
-  // Si está vacía o es solo comillas, intentar parsear
-  if (apiKeyFromDefine && (apiKeyFromDefine === '""' || apiKeyFromDefine.trim() === '')) {
-    apiKeyFromDefine = '';
+  // Vite hace JSON.stringify(), así que si está vacía viene como '""' (cadena con comillas)
+  // Intentar parsear si viene como JSON string
+  if (apiKeyFromDefine) {
+    try {
+      // Si viene como '""', JSON.parse lo convierte en cadena vacía
+      const parsed = JSON.parse(apiKeyFromDefine);
+      apiKeyFromDefine = parsed || '';
+    } catch (e) {
+      // Si no es JSON válido, usar el valor directo
+      // Si es solo comillas dobles, está vacía
+      if (apiKeyFromDefine === '""' || apiKeyFromDefine.trim() === '') {
+        apiKeyFromDefine = '';
+      }
+    }
   }
   
   // También intentar desde import.meta.env (fallback)
