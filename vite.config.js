@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
       __firebase_config: JSON.stringify(firebaseConfig),
       __app_id: JSON.stringify(env.VITE_APP_ID || 'default-app-id'),
       __initial_auth_token: JSON.stringify(null),
-      __gemini_api_key: JSON.stringify(env.VITE_GEMINI_API_KEY || 'AIzaSyCo-ZyM50ZmwbSsepA-Tdlj5TqzKAeF314')
+      __gemini_api_key: JSON.stringify(env.VITE_GEMINI_API_KEY || '')
     },
     server: {
       host: 'localhost',
