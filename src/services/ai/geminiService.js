@@ -45,7 +45,8 @@ export const callGeminiAI = async (userPrompt, contextData, ivaRate) => {
     };
   }
 
-  const model = "gemini-2.5-flash-preview-09-2025";
+  // Usar modelo estable (gemini-2.5-flash-preview puede requerir permisos especiales)
+  const model = "gemini-1.5-flash";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   try {
