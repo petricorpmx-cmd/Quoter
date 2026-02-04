@@ -16,6 +16,51 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   min-height: 100vh;
+  /* Prevenir zoom en iOS al hacer doble tap */
+  touch-action: manipulation;
+  /* Mejorar rendimiento en móvil */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe area para iPhone con notch */
+.safe-area-inset {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-inset-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-inset-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Mejorar touch targets para móvil */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevenir selección de texto accidental en móvil */
+input, textarea, select {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+button, a {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Animaciones personalizadas */
@@ -91,14 +136,16 @@ body {
   background: #94a3b8;
 }
 
-/* Efectos de hover mejorados */
-.hover-lift {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Efectos de hover mejorados - solo en desktop */
+@media (hover: hover) and (pointer: fine) {
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
 }
 
-.hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Gradientes modernos */

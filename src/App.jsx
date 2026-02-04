@@ -120,10 +120,10 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 flex flex-col md:flex-row text-slate-900 font-sans relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 flex flex-col md:flex-row text-slate-900 font-sans relative safe-area-inset">
       {/* Contenido Principal */}
-      <div className={`flex-1 p-4 md:p-8 transition-all duration-500 ${isChatOpen ? 'md:mr-[420px]' : ''}`}>
-        <div className="max-w-6xl mx-auto">
+      <div className={`flex-1 p-3 sm:p-4 md:p-8 pb-20 md:pb-8 transition-all duration-500 ${isChatOpen ? 'md:mr-[420px]' : ''}`}>
+        <div className="max-w-6xl mx-auto w-full">
           <Header 
             ivaRate={ivaRate}
             setIvaRate={setIvaRate}
@@ -180,13 +180,13 @@ const App = () => {
 
               <button 
                 onClick={agregarItem}
-                className="mt-10 w-full py-12 border-4 border-dashed border-slate-300 rounded-[3rem] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-gradient-to-br hover:from-white hover:to-blue-50/50 transition-all flex flex-col items-center justify-center gap-5 group hover-lift relative overflow-hidden"
+                className="mt-6 sm:mt-10 w-full py-8 sm:py-12 border-4 border-dashed border-slate-300 rounded-2xl sm:rounded-[3rem] text-slate-400 active:text-blue-600 active:border-blue-400 active:bg-gradient-to-br active:from-white active:to-blue-50/50 transition-all flex flex-col items-center justify-center gap-4 sm:gap-5 group active:scale-98 relative overflow-hidden touch-manipulation"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-50/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                <div className="relative p-5 bg-gradient-to-br from-slate-50 to-slate-100 rounded-full group-hover:from-blue-50 group-hover:to-indigo-50 transition-all shadow-inner group-hover:shadow-lg">
-                  <Plus size={36} className="group-hover:scale-110 transition-transform" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-50/50 to-transparent translate-x-[-100%] group-active:translate-x-[100%] transition-transform duration-1000"></div>
+                <div className="relative p-4 sm:p-5 bg-gradient-to-br from-slate-50 to-slate-100 rounded-full group-active:from-blue-50 group-active:to-indigo-50 transition-all shadow-inner group-active:shadow-lg">
+                  <Plus size={28} className="sm:w-9 sm:h-9 group-active:scale-110 transition-transform" />
                 </div>
-                <span className="relative font-black uppercase text-base tracking-[0.3em] group-hover:scale-105 transition-transform">
+                <span className="relative font-black uppercase text-sm sm:text-base tracking-[0.2em] sm:tracking-[0.3em] group-active:scale-105 transition-transform text-center px-4">
                   Nuevo Producto para Analizar
                 </span>
               </button>

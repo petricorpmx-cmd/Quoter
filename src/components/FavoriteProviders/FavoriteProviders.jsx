@@ -176,7 +176,103 @@ export const FavoriteProviders = ({ favoriteProviders, onDelete, isLoading, onDe
         </button>
       </div>
 
-      <div className="overflow-x-auto max-h-[calc(100vh-300px)]">
+      {/* Vista de Cards para Móvil */}
+      <div className="md:hidden space-y-3 p-3 max-h-[calc(100vh-300px)] overflow-y-auto">
+        {favoriteProviders.map((provider, index) => {
+          const fecha = provider.savedAt ? new Date(provider.savedAt).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }) : 'N/A';
+          const isSelected = selectedIds.includes(provider.id);
+          return (
+            <div
+              key={provider.id}
+              className={`p-4 rounded-xl border-2 transition-all animate-fade-in ${
+                isSelected 
+                  ? 'bg-blue-50 border-blue-300 shadow-lg' 
+                  : 'bg-white border-slate-200'
+              }`}
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleSelection(provider.id)}
+                    className="w-4 h-4 rounded border-2 border-slate-300 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer flex-shrink-0"
+                  />
+                  <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                    <Star size={14} className="text-emerald-500 fill-current flex-shrink-0" />
+                    <span className="font-black text-slate-900 text-sm truncate">{provider.nombre || 'Sin nombre'}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    if (window.confirm('¿Estás seguro de eliminar este proveedor guardado?')) {
+                      onDelete(provider.id);
+                    }
+                  }}
+                  className="p-1.5 text-slate-300 active:text-red-500 active:bg-red-50 rounded-lg transition-all active:scale-110 touch-manipulation flex-shrink-0"
+                  title="Eliminar proveedor guardado"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+              
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 font-bold">Producto:</span>
+                  <span className="font-black text-slate-900">{provider.productoNombre || 'N/A'}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-slate-500 font-bold block mb-1">Cantidad</span>
+                    <span className="font-black text-slate-900">{provider.cantidad || 0}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 font-bold block mb-1">Costo Base</span>
+                    <span className="font-black text-slate-900">${(provider.costo || 0).toFixed(2)}</span>
+                  </div>
+                  <div>
+                    <span className="text-blue-600 font-bold block mb-1">Costo + IVA</span>
+                    <span className="font-black text-blue-600">${provider.calculos?.costoMasIva?.toFixed(2) || '0.00'}</span>
+                  </div>
+                  <div>
+                    <span className="text-emerald-600 font-bold block mb-1">Ganancia</span>
+                    <span className="font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg inline-block">
+                      ${provider.calculos?.totalGanancia?.toFixed(2) || '0.00'}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                  <div className="flex items-center gap-1 text-slate-500">
+                    <Calendar size={12} />
+                    <span className="text-[10px] font-bold">{fecha}</span>
+                  </div>
+                  {provider.link && (
+                    <a 
+                      href={provider.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-1.5 text-blue-600 active:text-blue-700 active:bg-blue-50 rounded transition-all touch-manipulation"
+                      title="Abrir enlace"
+                    >
+                      <ExternalLink size={14} />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Vista de Tabla para Desktop */}
+      <div className="hidden md:block overflow-x-auto max-h-[calc(100vh-300px)]">
         <table className="w-full min-w-[1100px] text-sm">
           <thead className="sticky top-0 z-10">
             <tr className="bg-gradient-to-r from-slate-50 to-blue-50/30 border-b-2 border-slate-200">
