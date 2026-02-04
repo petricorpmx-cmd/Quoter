@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Star } from 'lucide-react';
+import { Plus, Star, Menu } from 'lucide-react';
 import { useAuth } from './hooks/useAuth';
 import { useFirestore } from './hooks/useFirestore';
 import { useChat } from './hooks/useChat';
@@ -9,7 +9,9 @@ import { ProductItem } from './components/ProductItem/ProductItem';
 import { ChatSidebar } from './components/ChatSidebar/ChatSidebar';
 import { FavoriteProviders } from './components/FavoriteProviders/FavoriteProviders';
 import { ConfirmDialog } from './components/ConfirmDialog/ConfirmDialog';
+import { Sidebar } from './components/Sidebar/Sidebar';
 import { handleExportPDF } from './utils/exportPDF';
+import { handleExportExcel } from './utils/exportExcel';
 
 const App = () => {
   const user = useAuth();
@@ -33,7 +35,9 @@ const App = () => {
   } = useFavoriteProviders(user);
   
   const [expandedItems, setExpandedItems] = useState([]);
-  const [showFavorites, setShowFavorites] = useState(false);
+  const [currentView, setCurrentView] = useState('analizador'); // 'analizador' o 'guardados'
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   // Estados para el diálogo de confirmación
   const [confirmDialog, setConfirmDialog] = useState({
@@ -181,22 +185,41 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 flex flex-col md:flex-row text-slate-900 font-sans relative safe-area-inset">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 flex text-slate-900 font-sans relative safe-area-inset">
+      {/* SIDEBAR LATERAL */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        currentView={currentView}
+        onViewChange={(view) => setCurrentView(view)}
+        isCollapsed={isSidebarCollapsed}
+        setIsCollapsed={setIsSidebarCollapsed}
+      />
+
       {/* Contenido Principal */}
-      <div className={`flex-1 p-3 sm:p-4 md:p-8 pb-20 md:pb-8 transition-all duration-500 ${isChatOpen ? 'md:mr-[420px]' : ''}`}>
+      <div className={`flex-1 p-3 sm:p-4 md:p-8 pb-20 md:pb-8 transition-all duration-500 ${
+        isSidebarCollapsed ? 'md:ml-[80px]' : 'md:ml-[288px]'
+      }`}>
         <div className="max-w-6xl mx-auto w-full">
+          {/* Botón para abrir sidebar en móvil */}
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="md:hidden fixed top-4 left-4 z-30 p-3 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-xl text-slate-700 shadow-lg active:scale-95 touch-manipulation"
+          >
+            <Menu size={24} />
+          </button>
+
           <Header 
             ivaRate={ivaRate}
             setIvaRate={setIvaRate}
-            onExportPDF={() => handleExportPDF(items, ivaRate)}
             isChatOpen={isChatOpen}
             setIsChatOpen={setIsChatOpen}
             isSaving={isSaving}
-            onShowFavorites={() => setShowFavorites(!showFavorites)}
-            showFavorites={showFavorites}
+            onShowFavorites={() => setCurrentView('guardados')}
+            showFavorites={currentView === 'guardados'}
           />
 
-          {showFavorites ? (
+          {currentView === 'guardados' ? (
             <div className="animate-fade-in">
               <div className="mb-8">
                 <div className="flex items-center gap-4 mb-3">
@@ -239,6 +262,7 @@ const App = () => {
                     <ProductItem
                       item={item}
                       ivaRate={ivaRate}
+                      setIvaRate={setIvaRate}
                       expandedItems={expandedItems}
                       setExpandedItems={setExpandedItems}
                       setItems={setItems}

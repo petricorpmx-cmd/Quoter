@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, Trash2, ChevronDown, Plus, Star } from 'lucide-react';
+import { Tag, Trash2, ChevronDown, Plus, Star, Percent, Package } from 'lucide-react';
 import { ProviderTable } from '../ProviderTable/ProviderTable';
 import { SavingsSummary } from '../SavingsSummary/SavingsSummary';
 import { CostDistribution } from '../CostDistribution/CostDistribution';
@@ -8,7 +8,8 @@ import { findBestProvider } from '../../utils/findBestProvider';
 
 export const ProductItem = ({ 
   item, 
-  ivaRate, 
+  ivaRate,
+  setIvaRate,
   expandedItems, 
   setExpandedItems, 
   setItems, 
@@ -72,20 +73,6 @@ export const ProductItem = ({
               <span className="text-[10px] sm:text-xs text-slate-400 font-bold mt-1">NOMBRE DEL ITEM</span>
             </div>
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-wider hidden sm:inline">CANTIDAD</span>
-            <div className="bg-slate-100 rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
-              <input 
-                type="number" 
-                value={item.cantidad}
-                onClick={(e) => e.stopPropagation()}
-                onChange={(e) => setItems(items.map(i => 
-                  i.id === item.id ? {...i, cantidad: Number(e.target.value)} : i
-                ))}
-                className="w-10 sm:w-12 bg-transparent text-center font-black text-slate-900 outline-none text-sm sm:text-base"
-              />
-            </div>
-          </div>
         </div>
         
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -109,6 +96,81 @@ export const ProductItem = ({
 
       {isExpanded && (
         <div className="p-4 sm:p-6 pt-0 border-t border-slate-100 bg-white animate-fade-in">
+          {/* Sección de Configuración: IVA y Cantidad */}
+          <div className="mb-4 sm:mb-6 p-4 bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-xl border border-slate-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              {/* Configuración de IVA */}
+              <div className="flex-1 w-full sm:w-auto">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2 flex items-center gap-2">
+                  <Percent size={14} className="text-slate-400" />
+                  Tasa de IVA
+                </label>
+                <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 p-2 shadow-sm">
+                  <input 
+                    type="text" 
+                    inputMode="decimal"
+                    value={ivaRate === 0 ? '' : ivaRate}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Permitir solo números y punto decimal
+                      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                        setIvaRate(value === '' ? 0 : Number(value));
+                      }
+                    }}
+                    onBlur={(e) => {
+                      // Asegurar que siempre haya un valor numérico al perder el foco
+                      if (e.target.value === '' || isNaN(Number(e.target.value))) {
+                        setIvaRate(16);
+                      }
+                    }}
+                    className="w-16 text-center font-black text-slate-900 outline-none bg-transparent text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded px-2"
+                    placeholder="16"
+                  />
+                  <span className="text-slate-500 font-bold text-sm">%</span>
+                </div>
+              </div>
+
+              {/* Separador visual */}
+              <div className="hidden sm:block w-px h-12 bg-slate-200"></div>
+
+              {/* Configuración de Cantidad */}
+              <div className="flex-1 w-full sm:w-auto">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2 flex items-center gap-2">
+                  <Package size={14} className="text-slate-400" />
+                  Cantidad del Item
+                </label>
+                <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 p-2 shadow-sm">
+                  <input 
+                    type="text" 
+                    inputMode="numeric"
+                    value={item.cantidad === 0 ? '' : item.cantidad}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Permitir solo números enteros
+                      if (value === '' || /^\d+$/.test(value)) {
+                        setItems(items.map(i => 
+                          i.id === item.id ? {...i, cantidad: value === '' ? 0 : Number(value)} : i
+                        ));
+                      }
+                    }}
+                    onBlur={(e) => {
+                      // Asegurar que siempre haya un valor numérico al perder el foco
+                      const value = e.target.value;
+                      if (value === '' || isNaN(Number(value)) || Number(value) < 1) {
+                        setItems(items.map(i => 
+                          i.id === item.id ? {...i, cantidad: 1} : i
+                        ));
+                      }
+                    }}
+                    className="w-20 text-center font-black text-slate-900 outline-none bg-transparent text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded px-2"
+                    placeholder="1"
+                  />
+                  <span className="text-slate-500 font-medium text-sm">unidades</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Cards de Resumen y Distribución */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
             <SavingsSummary 

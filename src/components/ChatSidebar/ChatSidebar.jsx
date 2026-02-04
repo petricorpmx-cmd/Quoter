@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, ChevronDown, Send, Loader2, ExternalLink } from 'lucide-react';
+import { Bot, ChevronDown, Send, Loader2, ExternalLink, X } from 'lucide-react';
 
 export const ChatSidebar = ({
   isChatOpen,
@@ -13,15 +13,28 @@ export const ChatSidebar = ({
 }) => {
   return (
     <>
-      {/* Overlay para móvil */}
+      {/* Botón Flotante - Esquina Inferior Derecha */}
+      {!isChatOpen && (
+        <button
+          onClick={() => setIsChatOpen(true)}
+          className="fixed bottom-6 right-6 z-50 p-4 sm:p-5 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full shadow-2xl shadow-blue-500/50 hover:shadow-blue-600/60 transition-all active:scale-95 hover:scale-110 touch-manipulation safe-area-inset-bottom safe-area-inset-right group"
+        >
+          <Bot size={28} className="sm:w-8 sm:h-8 group-active:scale-110 transition-transform" />
+          <span className="absolute -top-2 -right-2 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white animate-pulse"></span>
+        </button>
+      )}
+
+      {/* Overlay */}
       {isChatOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden transition-opacity duration-500"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-500"
           onClick={() => setIsChatOpen(false)}
         />
       )}
-      <aside className={`fixed top-0 right-0 h-full w-full md:w-[420px] bg-white/95 backdrop-blur-md shadow-[-30px_0_60px_rgba(0,0,0,0.12)] flex flex-col transition-transform duration-500 ease-in-out z-50 safe-area-inset-right ${
-        isChatOpen ? 'translate-x-0' : 'translate-x-full'
+
+      {/* Chat Sidebar/Modal */}
+      <aside className={`fixed top-0 right-0 h-full w-full md:w-[420px] md:h-[600px] md:top-auto md:bottom-6 md:right-6 md:rounded-3xl bg-white/95 backdrop-blur-md shadow-[-30px_0_60px_rgba(0,0,0,0.12)] md:shadow-2xl flex flex-col transition-all duration-500 ease-in-out z-50 safe-area-inset-right ${
+        isChatOpen ? 'translate-x-0 translate-y-0' : 'translate-x-full md:translate-x-0 md:translate-y-full md:opacity-0 md:pointer-events-none'
       }`}>
       <div className="p-4 sm:p-6 border-b-2 border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50/80 to-blue-50/50 backdrop-blur-sm safe-area-inset-top">
         <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
@@ -46,7 +59,7 @@ export const ChatSidebar = ({
           onClick={() => setIsChatOpen(false)} 
           className="p-2.5 sm:p-3 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl sm:rounded-2xl text-slate-400 active:text-slate-800 active:bg-white shadow-sm transition-all active:scale-90 touch-manipulation flex-shrink-0"
         >
-          <ChevronDown size={20} className="sm:w-6 sm:h-6 rotate-[-90deg]" />
+          <X size={20} className="sm:w-6 sm:h-6" />
         </button>
       </div>
 
