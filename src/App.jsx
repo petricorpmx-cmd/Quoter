@@ -8,6 +8,7 @@ import { Header } from './components/Header/Header';
 import { ProductItem } from './components/ProductItem/ProductItem';
 import { ChatSidebar } from './components/ChatSidebar/ChatSidebar';
 import { FavoriteProviders } from './components/FavoriteProviders/FavoriteProviders';
+import { ConfirmDialog } from './components/ConfirmDialog/ConfirmDialog';
 import { handleExportPDF } from './utils/exportPDF';
 
 const App = () => {
@@ -33,6 +34,17 @@ const App = () => {
   
   const [expandedItems, setExpandedItems] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
+  
+  // Estados para el diálogo de confirmación
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    type: 'warning',
+    title: '',
+    message: '',
+    confirmText: 'Confirmar',
+    cancelText: 'Cancelar',
+    onConfirm: null
+  });
 
   // --- MANEJADORES DE DATOS ---
   const agregarItem = () => {
@@ -89,27 +101,76 @@ const App = () => {
     ));
   };
 
-  const handleSaveBestProvider = async (bestProvider) => {
+  const handleSaveBestProvider = (bestProvider) => {
     if (!bestProvider) {
-      alert('⚠️ No se encontró un proveedor para guardar');
+      setConfirmDialog({
+        isOpen: true,
+        type: 'warning',
+        title: 'Proveedor no encontrado',
+        message: 'No se encontró un proveedor para guardar. Por favor, verifica que hay proveedores con datos válidos.',
+        confirmText: 'Entendido',
+        cancelText: '',
+        onConfirm: () => setConfirmDialog({ ...confirmDialog, isOpen: false })
+      });
       return;
     }
 
-    console.log('Guardando mejor proveedor:', bestProvider);
-    console.log('Usuario actual:', user);
-    
-    const success = await saveProvider(bestProvider);
-    if (success) {
-      alert('✅ Proveedor guardado exitosamente');
-    } else {
-      alert('❌ Error al guardar el proveedor. Revisa la consola (F12) para más detalles.');
-    }
+    // Mostrar confirmación antes de guardar
+    setConfirmDialog({
+      isOpen: true,
+      type: 'info',
+      title: 'Guardar Proveedor Favorito',
+      message: `¿Deseas guardar "${bestProvider.nombre || 'Proveedor'}" como proveedor favorito? Este proveedor aparecerá en tu lista de guardados.`,
+      confirmText: 'Sí, Guardar',
+      cancelText: 'Cancelar',
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false });
+        console.log('Guardando mejor proveedor:', bestProvider);
+        console.log('Usuario actual:', user);
+        
+        const success = await saveProvider(bestProvider);
+        if (success) {
+          setConfirmDialog({
+            isOpen: true,
+            type: 'info',
+            title: '✅ Guardado Exitoso',
+            message: 'El proveedor se ha guardado correctamente en tu lista de favoritos.',
+            confirmText: 'Perfecto',
+            cancelText: '',
+            onConfirm: () => setConfirmDialog({ ...confirmDialog, isOpen: false })
+          });
+        } else {
+          setConfirmDialog({
+            isOpen: true,
+            type: 'danger',
+            title: '❌ Error al Guardar',
+            message: 'No se pudo guardar el proveedor. Por favor, intenta nuevamente o revisa la consola para más detalles.',
+            confirmText: 'Entendido',
+            cancelText: '',
+            onConfirm: () => setConfirmDialog({ ...confirmDialog, isOpen: false })
+          });
+        }
+      }
+    });
   };
 
-  const handleDeleteFavorite = async (providerId) => {
-    if (window.confirm('¿Estás seguro de eliminar este proveedor guardado?')) {
-      await deleteProvider(providerId);
-    }
+  const handleDeleteFavorite = (providerId) => {
+    // Buscar el proveedor para mostrar su nombre en la confirmación
+    const provider = favoriteProviders.find(p => p.id === providerId);
+    const providerName = provider?.nombre || 'este proveedor';
+    
+    setConfirmDialog({
+      isOpen: true,
+      type: 'danger',
+      title: 'Eliminar Proveedor Favorito',
+      message: `¿Estás seguro de que deseas eliminar "${providerName}" de tu lista de proveedores guardados? Esta acción no se puede deshacer.`,
+      confirmText: 'Sí, Eliminar',
+      cancelText: 'Cancelar',
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false });
+        await deleteProvider(providerId);
+      }
+    });
   };
 
   const handleDeleteMultipleFavorites = async (providerIds) => {
@@ -153,7 +214,20 @@ const App = () => {
               <FavoriteProviders 
                 favoriteProviders={favoriteProviders}
                 onDelete={handleDeleteFavorite}
-                onDeleteMultiple={handleDeleteMultipleFavorites}
+                onDeleteMultiple={(providerIds) => {
+                  setConfirmDialog({
+                    isOpen: true,
+                    type: 'danger',
+                    title: 'Eliminar Múltiples Proveedores',
+                    message: `¿Estás seguro de que deseas eliminar ${providerIds.length} proveedor(es) guardado(s)? Esta acción no se puede deshacer.`,
+                    confirmText: 'Sí, Eliminar',
+                    cancelText: 'Cancelar',
+                    onConfirm: async () => {
+                      setConfirmDialog({ ...confirmDialog, isOpen: false });
+                      await handleDeleteMultipleFavorites(providerIds);
+                    }
+                  });
+                }}
                 isLoading={isLoadingFavorites}
               />
             </div>
@@ -205,6 +279,18 @@ const App = () => {
         isTyping={isTyping}
         chatEndRef={chatEndRef}
         handleSendMessage={handleSendMessage}
+      />
+
+      {/* DIALOGO DE CONFIRMACIÓN */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+        onConfirm={confirmDialog.onConfirm || (() => {})}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText={confirmDialog.confirmText}
+        cancelText={confirmDialog.cancelText}
+        type={confirmDialog.type}
       />
     </div>
   );

@@ -26,20 +26,15 @@ export const FavoriteProviders = ({ favoriteProviders, onDelete, isLoading, onDe
   const handleDeleteSelected = () => {
     if (selectedIds.length === 0) return;
     
-    const confirmMessage = `¿Estás seguro de eliminar ${selectedIds.length} proveedor(es) guardado(s)?`;
-    const confirmed = window.confirm(confirmMessage);
-    
-    if (confirmed) {
-      // Eliminar todos los seleccionados sin confirmación individual
-      if (onDeleteMultiple) {
-        // Si hay función para eliminar múltiples, usarla
-        onDeleteMultiple(selectedIds);
-      } else {
-        // Si no, eliminar uno por uno sin confirmación
-        selectedIds.forEach(id => {
-          onDelete(id);
-        });
-      }
+    // Usar la función onDeleteMultiple que ya tiene la confirmación integrada
+    if (onDeleteMultiple) {
+      onDeleteMultiple(selectedIds);
+      setSelectedIds([]);
+    } else {
+      // Si no hay función para eliminar múltiples, eliminar uno por uno
+      selectedIds.forEach(id => {
+        onDelete(id);
+      });
       setSelectedIds([]);
     }
   };
@@ -211,11 +206,7 @@ export const FavoriteProviders = ({ favoriteProviders, onDelete, isLoading, onDe
                   </div>
                 </div>
                 <button
-                  onClick={() => {
-                    if (window.confirm('¿Estás seguro de eliminar este proveedor guardado?')) {
-                      onDelete(provider.id);
-                    }
-                  }}
+                  onClick={() => onDelete(provider.id)}
                   className="p-1.5 text-slate-300 active:text-red-500 active:bg-red-50 rounded-lg transition-all active:scale-110 touch-manipulation flex-shrink-0"
                   title="Eliminar proveedor guardado"
                 >
@@ -409,12 +400,8 @@ export const FavoriteProviders = ({ favoriteProviders, onDelete, isLoading, onDe
                   </td>
                   <td className="p-2 text-center">
                     <button
-                      onClick={() => {
-                        if (window.confirm('¿Estás seguro de eliminar este proveedor guardado?')) {
-                          onDelete(provider.id);
-                        }
-                      }}
-                      className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100"
+                      onClick={() => onDelete(provider.id)}
+                      className="p-1.5 text-slate-300 active:text-red-500 active:bg-red-50 rounded-lg transition-all active:scale-110 opacity-0 group-hover:opacity-100 touch-manipulation"
                       title="Eliminar proveedor guardado"
                     >
                       <Trash2 size={14} />
