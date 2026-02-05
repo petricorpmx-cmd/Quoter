@@ -186,6 +186,31 @@ html, body {
   font-weight: 600;
 }
 
+/* Clases para el body cuando el sidebar está activo */
+body.with-react-nav {
+  /* El padding se maneja con clases de Tailwind en el contenido */
+}
+
+body.nav-expanded {
+  /* Sidebar expandido */
+}
+
+/* Modo oscuro para el sidebar */
+@media (prefers-color-scheme: dark) {
+  .dark .menu-item {
+    color: #e5e7eb; /* gray-200 */
+  }
+  
+  .dark .menu-item:hover {
+    background-color: rgba(59, 130, 246, 0.2); /* blue-500 con 20% opacity */
+  }
+  
+  .dark .menu-item.active {
+    background-color: rgba(59, 130, 246, 0.3); /* blue-500 con 30% opacity */
+    color: #93c5fd; /* blue-300 */
+  }
+}
+
 /* Modo Oscuro (Opcional) */
 .dark {
   background: #111827;

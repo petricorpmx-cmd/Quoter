@@ -1,24 +1,21 @@
-import React, { useState } from 'react';
-import { Calculator, Star, X, ChevronLeft, ChevronRight, ChevronDown, Settings, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calculator, Star, Settings, Users, ChevronLeft, Menu, X } from 'lucide-react';
 
 export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapsed, setIsCollapsed }) => {
-  // Estado para controlar qué submenús están abiertos
-  const [openSubmenus, setOpenSubmenus] = useState({
-    analizador: true,
-    administracion: false
-  });
-  
+  // Estado para controlar qué submenú está abierto (solo uno a la vez - acordeón)
+  const [openSubmenu, setOpenSubmenu] = useState(null);
+
   const menuItems = [
     {
       id: 'analizador',
       label: 'Analizador Pro',
       icon: Calculator,
-      isMain: true,
       submenu: [
         {
           id: 'guardados',
           label: 'Guardados',
-          icon: Star
+          icon: Star,
+          parent: 'analizador'
         }
       ]
     },
@@ -26,22 +23,63 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
       id: 'administracion',
       label: 'Administración de Sistema',
       icon: Settings,
-      isMain: false,
       submenu: [
         {
           id: 'usuarios-sistema',
           label: 'Usuarios del sistema',
-          icon: Users
+          icon: Users,
+          parent: 'administracion'
         }
       ]
     }
   ];
 
+  // Efecto para agregar clases al body
+  useEffect(() => {
+    const body = document.body;
+    
+    if (isOpen || !isCollapsed) {
+      body.classList.add('with-react-nav');
+    } else {
+      body.classList.remove('with-react-nav');
+    }
+    
+    if (!isCollapsed) {
+      body.classList.add('nav-expanded');
+    } else {
+      body.classList.remove('nav-expanded');
+    }
+
+    return () => {
+      body.classList.remove('with-react-nav', 'nav-expanded');
+    };
+  }, [isOpen, isCollapsed]);
+
+  // Disparar evento section:changed al navegar
+  const handleViewChange = (viewId) => {
+    onViewChange(viewId);
+    onClose();
+    
+    // Disparar evento personalizado
+    const event = new CustomEvent('section:changed', {
+      detail: { section: viewId }
+    });
+    window.dispatchEvent(event);
+  };
+
+  // Toggle submenú (solo uno abierto a la vez)
   const toggleSubmenu = (itemId) => {
-    setOpenSubmenus(prev => ({
-      ...prev,
-      [itemId]: !prev[itemId]
-    }));
+    setOpenSubmenu(prev => prev === itemId ? null : itemId);
+  };
+
+  // Verificar si un item está activo
+  const isItemActive = (itemId) => {
+    return currentView === itemId;
+  };
+
+  // Verificar si algún subitem está activo
+  const hasActiveSubitem = (item) => {
+    return item.submenu?.some((sub) => sub.id === currentView);
   };
 
   return (
@@ -56,123 +94,145 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 h-full bg-white border-r border-slate-200
+        fixed top-0 left-0 h-full bg-gray-50 border-r border-gray-200
         flex flex-col transition-all duration-300 ease-in-out z-50 safe-area-inset-left
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0
-        ${isCollapsed ? 'w-16 sm:w-20' : 'w-64 sm:w-72'}
+        ${isCollapsed ? 'w-16' : 'w-56'}
       `}>
         {/* Header del Sidebar */}
-        <div className={`border-b border-slate-200 flex flex-col bg-white relative ${isCollapsed ? 'p-3' : 'p-4 sm:p-5'}`}>
-          {/* Logo y Título */}
+        <div className={`border-b border-gray-200 bg-gray-50 ${isCollapsed ? 'p-3 flex flex-col items-center gap-3' : 'p-4 flex items-center justify-between'}`}>
+          {/* Logo */}
           {!isCollapsed && (
-            <div className="flex items-center gap-3 min-w-0 flex-1 mb-4">
-              <div className="flex-shrink-0 bg-blue-600 p-2 rounded-lg">
-                <Calculator size={20} className="text-white" />
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="flex-shrink-0 bg-blue-500 p-2 rounded-md">
+                <Calculator size={20} strokeWidth={2} className="text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="font-bold text-slate-900 leading-none text-base truncate">
+                <h2 className="font-bold text-gray-900 leading-none text-sm truncate">
                   Analizador Pro
                 </h2>
               </div>
             </div>
           )}
           {isCollapsed && (
-            <div className="flex items-center justify-center w-full mb-4">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Calculator size={20} className="text-white" />
+            <div className="flex flex-col items-center gap-3 w-full">
+              <div className="bg-blue-500 p-2 rounded-md">
+                <Calculator size={20} strokeWidth={2} className="text-white" />
               </div>
+              {/* Botón Hamburger debajo del logo cuando está contraído */}
+              <button 
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="hidden md:flex items-center justify-center w-7 h-7 rounded border border-gray-300 bg-white text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                title="Expandir menú"
+              >
+                <Menu size={14} strokeWidth={2} />
+              </button>
             </div>
           )}
           
-          {/* Botón de Colapsar */}
-          <div className="flex items-center justify-center">
-            <button 
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="hidden md:flex items-center justify-center w-7 h-7 rounded border border-slate-300 bg-white text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all"
-              title={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
-            >
-              {isCollapsed ? (
-                <ChevronRight size={12} strokeWidth={2} />
-              ) : (
-                <ChevronLeft size={12} strokeWidth={2} />
-              )}
-            </button>
-            {/* Botón para cerrar en móvil */}
-            <button 
-              onClick={onClose} 
-              className="md:hidden p-2 text-slate-500 hover:text-slate-700 transition-colors"
-            >
-              <X size={20} />
-            </button>
-          </div>
+          {/* Botón Pin/Hamburger (solo cuando está expandido) */}
+          {!isCollapsed && (
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="hidden md:flex items-center justify-center w-7 h-7 rounded border border-gray-300 bg-white text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                title="Contraer menú"
+              >
+                <ChevronLeft size={14} strokeWidth={2} />
+              </button>
+              {/* Botón para cerrar en móvil */}
+              <button 
+                onClick={onClose} 
+                className="md:hidden p-2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+              >
+                <X size={20} strokeWidth={2} />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Menú Items */}
-        <nav className={`flex-1 overflow-y-auto overflow-x-visible ${isCollapsed ? 'p-2' : 'p-2'}`}>
+        <nav className="flex-1 overflow-y-auto overflow-x-visible p-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = currentView === item.id || (item.submenu && item.submenu.some(sub => sub.id === currentView));
-            const isItemActive = currentView === item.id;
-            const isSubmenuOpen = openSubmenus[item.id] || false;
+            const isActive = isItemActive(item.id) || hasActiveSubitem(item);
+            const isSubmenuOpen = openSubmenu === item.id;
             
             return (
-              <div key={item.id} className="space-y-0.5">
+              <div key={item.id} className="mb-1">
                 {/* Item Principal */}
                 <div className="relative group">
                   <div className="flex items-center w-full">
                     <button
                       onClick={() => {
-                        // Siempre cambiar a la vista del item principal
-                        onViewChange(item.id);
-                        onClose();
-                        // Si está colapsado, expandir el sidebar
-                        if (isCollapsed) {
-                          setIsCollapsed(false);
-                          setOpenSubmenus(prev => ({ ...prev, [item.id]: true }));
+                        if (item.submenu && item.submenu.length > 0) {
+                          // Si tiene submenú, toggle el acordeón
+                          if (!isCollapsed) {
+                            toggleSubmenu(item.id);
+                          } else {
+                            // Si está colapsado, expandir sidebar y abrir submenú
+                            setIsCollapsed(false);
+                            setOpenSubmenu(item.id);
+                          }
+                        } else {
+                          // Si no tiene submenú, navegar directamente
+                          handleViewChange(item.id);
+                          if (isCollapsed) {
+                            setIsCollapsed(false);
+                          }
                         }
                       }}
-                    className={`menu-item ${isCollapsed ? 'justify-center px-2' : 'justify-start px-4'} ${isItemActive ? 'active' : ''}`}
-                    title={isCollapsed ? item.label : ''}
-                  >
-                    {/* Borde izquierdo azul cuando está activo */}
-                    {isItemActive && (
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600"></div>
-                    )}
+                      className={`
+                        menu-item flex-1 flex items-center gap-3 rounded-md transition-all duration-200
+                        ${isCollapsed ? 'justify-center px-2' : 'justify-start px-3'}
+                        ${isActive 
+                          ? 'bg-blue-100 text-blue-900 font-semibold' 
+                          : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                        }
+                      `}
+                      title={isCollapsed ? item.label : ''}
+                    >
+                      {/* Indicador de activo */}
+                      {isActive && !isCollapsed && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 rounded-l-md"></div>
+                      )}
                       <Icon 
                         size={18} 
-                        className={`flex-shrink-0 ${isItemActive ? 'text-white' : 'text-slate-600'}`}
+                        strokeWidth={2}
+                        className={`flex-shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-600'}`}
                       />
                       {!isCollapsed && (
-                        <span className="text-left flex-1 uppercase tracking-wide">{item.label}</span>
+                        <span className="text-sm flex-1 text-left">{item.label}</span>
                       )}
                     </button>
-                    {/* Botón separado para expandir/colapsar submenú */}
-                    {!isCollapsed && item.submenu && (
+                    
+                    {/* Indicador de submenú (solo en expandido) */}
+                    {!isCollapsed && item.submenu && item.submenu.length > 0 && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleSubmenu(item.id);
                         }}
-                        className={`px-2 py-3 transition-colors ${isItemActive ? 'text-white/80 hover:text-white' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`px-2 py-2 transition-colors duration-200 ${
+                          isActive ? 'text-blue-600 hover:text-blue-700' : 'text-gray-400 hover:text-gray-600'
+                        }`}
                         title={isSubmenuOpen ? 'Colapsar submenú' : 'Expandir submenú'}
                       >
-                        <ChevronDown 
-                          size={12} 
-                          className={`transition-transform duration-200 ${isSubmenuOpen ? 'rotate-180' : ''} ${isItemActive ? 'text-white' : 'text-slate-400'}`}
-                          strokeWidth={2.5}
-                        />
+                        <span className="text-sm font-bold">
+                          {isSubmenuOpen ? '▾' : '▸'}
+                        </span>
                       </button>
                     )}
                   </div>
-                  {/* Tooltip cuando está colapsado - Diseño profesional */}
+                  
+                  {/* Tooltip cuando está colapsado */}
                   {isCollapsed && (
-                    <div className="absolute left-full top-0 ml-2 opacity-0 group-hover:opacity-100 transition-all duration-200 z-[100]">
-                      {/* Contenedor blanco con el texto principal y subitems */}
-                      <div className="bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden min-w-[220px] pointer-events-auto">
+                    <div className="absolute left-full top-0 ml-2 opacity-0 group-hover:opacity-100 transition-all duration-200 z-[100] pointer-events-none">
+                      <div className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden min-w-[200px] pointer-events-auto">
                         {/* Título principal */}
-                        <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
-                          <span className="text-sm font-semibold text-slate-900 uppercase tracking-wide">{item.label}</span>
+                        <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                          <span className="text-sm font-semibold text-gray-900">{item.label}</span>
                         </div>
                         {/* Subitems */}
                         {item.submenu && item.submenu.length > 0 && (
@@ -184,14 +244,13 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
                                   key={subItem.id}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    onViewChange(subItem.id);
-                                    onClose();
+                                    handleViewChange(subItem.id);
                                   }}
                                   className={`
                                     w-full text-left px-4 py-2.5 text-sm transition-colors duration-150
                                     ${isSubActive 
                                       ? 'text-blue-600 font-medium bg-blue-50' 
-                                      : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600'
+                                      : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'
                                     }
                                   `}
                                 >
@@ -206,20 +265,23 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
                   )}
                 </div>
 
-                {/* Submenú */}
+                {/* Submenú (acordeón - solo uno abierto a la vez) */}
                 {!isCollapsed && item.submenu && isSubmenuOpen && (
-                  <div className="space-y-0.5">
+                  <div className="mt-1 ml-4 space-y-0.5 border-l-2 border-gray-200 pl-2">
                     {item.submenu.map((subItem) => {
                       const isSubActive = currentView === subItem.id;
                       
                       return (
                         <button
                           key={subItem.id}
-                          onClick={() => {
-                            onViewChange(subItem.id);
-                            onClose();
-                          }}
-                          className={`menu-item pl-12 ${isSubActive ? 'active' : ''}`}
+                          onClick={() => handleViewChange(subItem.id)}
+                          className={`
+                            menu-item w-full text-left px-3 py-2 rounded-md transition-all duration-200
+                            ${isSubActive 
+                              ? 'bg-blue-50 text-blue-700 font-medium' 
+                              : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'
+                            }
+                          `}
                         >
                           {subItem.label}
                         </button>
@@ -234,8 +296,8 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
 
         {/* Footer del Sidebar */}
         {!isCollapsed && (
-          <div className="p-4 border-t border-slate-200 bg-white">
-            <div className="text-xs text-slate-500 text-center">
+          <div className="p-4 border-t border-gray-200 bg-gray-50">
+            <div className="text-xs text-gray-500 text-center">
               <p className="mb-1">Versión 1.0.0</p>
               <p className="opacity-75">© 2024 Analizador Pro</p>
             </div>

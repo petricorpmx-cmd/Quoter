@@ -228,8 +228,8 @@ const App = () => {
       />
 
       {/* Contenido Principal */}
-      <div className={`flex-1 p-3 sm:p-4 md:p-8 pb-20 md:pb-8 transition-all duration-500 ${
-        isSidebarCollapsed ? 'md:ml-[80px]' : 'md:ml-[288px]'
+      <div className={`flex-1 p-3 sm:p-4 md:p-8 pb-20 md:pb-8 transition-all duration-300 ${
+        isSidebarCollapsed ? 'md:pl-20' : 'md:pl-60'
       }`}>
         <div className="max-w-6xl mx-auto w-full">
           {/* Botón para abrir sidebar en móvil */}
