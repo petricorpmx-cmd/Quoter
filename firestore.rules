@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Reglas para el módulo de administración de sistema - Usuarios (colección compartida)
+    match /modules/administracion-sistema/usuarios/{usuarioId} {
+      // Permitir lectura y escritura a cualquier usuario autenticado (todos los admins pueden gestionar usuarios)
+      allow read, write: if request.auth != null;
+    }
+    
+    // Reglas para la estructura antigua (para migración)
+    match /modules/administracion-sistema/users/{userId}/usuarios/{usuarioId} {
+      // Permitir lectura para migración, escritura solo al dueño
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Permitir listar los documentos de users para migración
+    match /modules/administracion-sistema/users/{userId} {
+      allow read: if request.auth != null;
+    }
+    
+    // Reglas para proveedores favoritos (mantener compatibilidad)
+    match /favoriteProviders/{providerId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Reglas para artifacts (mantener compatibilidad)
+    match /artifacts/{appId}/public/data/settings/appState {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Reglas para users (perfil de usuario)
+    match /users/{email} {
+      // Permitir lectura a cualquier usuario autenticado
+      allow read: if request.auth != null;
+      // Permitir escritura solo si el usuario está autenticado
+      // Nota: En producción, podrías querer restringir esto más
+      allow write: if request.auth != null;
+    }
+  }
+}

@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { Calculator, Star, X, ChevronLeft, ChevronRight, ChevronDown, ChevronRight as ChevronRightSmall } from 'lucide-react';
+import { Calculator, Star, X, ChevronLeft, ChevronRight, ChevronDown, Settings, Users } from 'lucide-react';
 
 export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapsed, setIsCollapsed }) => {
-  const [isSubmenuOpen, setIsSubmenuOpen] = useState(true); // Submenú expandido por defecto
+  // Estado para controlar qué submenús están abiertos
+  const [openSubmenus, setOpenSubmenus] = useState({
+    analizador: true,
+    administracion: false
+  });
   
   const menuItems = [
     {
@@ -17,8 +21,28 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
           icon: Star
         }
       ]
+    },
+    {
+      id: 'administracion',
+      label: 'Administración de Sistema',
+      icon: Settings,
+      isMain: false,
+      submenu: [
+        {
+          id: 'usuarios-sistema',
+          label: 'Usuarios del sistema',
+          icon: Users
+        }
+      ]
     }
   ];
+
+  const toggleSubmenu = (itemId) => {
+    setOpenSubmenus(prev => ({
+      ...prev,
+      [itemId]: !prev[itemId]
+    }));
+  };
 
   return (
     <>
@@ -90,6 +114,7 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
             const Icon = item.icon;
             const isActive = currentView === item.id || (item.submenu && item.submenu.some(sub => sub.id === currentView));
             const isItemActive = currentView === item.id;
+            const isSubmenuOpen = openSubmenus[item.id] || false;
             
             return (
               <div key={item.id} className="space-y-0.5">
@@ -104,18 +129,10 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
                         // Si está colapsado, expandir el sidebar
                         if (isCollapsed) {
                           setIsCollapsed(false);
-                          setIsSubmenuOpen(true);
+                          setOpenSubmenus(prev => ({ ...prev, [item.id]: true }));
                         }
                       }}
-                    className={`
-                      flex-1 flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'} gap-3
-                      ${isCollapsed ? 'px-2 py-3' : 'px-4 py-3'} 
-                      text-sm font-medium transition-all duration-150 relative
-                      ${isItemActive 
-                        ? 'bg-blue-500 text-white' 
-                        : 'text-slate-700 hover:bg-slate-100'
-                      }
-                    `}
+                    className={`menu-item ${isCollapsed ? 'justify-center px-2' : 'justify-start px-4'} ${isItemActive ? 'active' : ''}`}
                     title={isCollapsed ? item.label : ''}
                   >
                     {/* Borde izquierdo azul cuando está activo */}
@@ -135,7 +152,7 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setIsSubmenuOpen(!isSubmenuOpen);
+                          toggleSubmenu(item.id);
                         }}
                         className={`px-2 py-3 transition-colors ${isItemActive ? 'text-white/80 hover:text-white' : 'text-slate-400 hover:text-slate-600'}`}
                         title={isSubmenuOpen ? 'Colapsar submenú' : 'Expandir submenú'}
@@ -202,14 +219,7 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
                             onViewChange(subItem.id);
                             onClose();
                           }}
-                          className={`
-                            w-full text-left px-4 py-2.5 pl-12
-                            text-sm font-normal transition-colors duration-150
-                            ${isSubActive 
-                              ? 'text-blue-600 font-medium bg-blue-50' 
-                              : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
-                            }
-                          `}
+                          className={`menu-item pl-12 ${isSubActive ? 'active' : ''}`}
                         >
                           {subItem.label}
                         </button>

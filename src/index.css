@@ -8,18 +8,217 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+html, body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
   min-height: 100vh;
   /* Prevenir zoom en iOS al hacer doble tap */
   touch-action: manipulation;
   /* Mejorar rendimiento en móvil */
   -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================
+   SISTEMA DE DISEÑO - COMPONENTES
+   ============================================ */
+
+/* Botones */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 150ms ease;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  touch-action: manipulation;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background-color: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: #374151;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.btn-danger {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+/* Cards */
+.card {
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+/* Formularios */
+.form-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 150ms ease;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+/* Tablas */
+.table-wrap {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-wrap thead {
+  background-color: #f9fafb;
+}
+
+.table-wrap th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-wrap td {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.table-wrap tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.table-wrap tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Menú */
+.menu-item {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  transition: background-color 300ms;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.menu-item:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.menu-item.active {
+  background-color: #dbeafe;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+/* Modo Oscuro (Opcional) */
+.dark {
+  background: #111827;
+  color: #e5e7eb;
+}
+
+.dark .card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.dark .btn-primary {
+  background-color: #2563eb;
+}
+
+.dark .form-input {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+.dark .table-wrap {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.dark .table-wrap th {
+  background-color: #111827;
+  color: #e5e7eb;
+}
+
+.dark .table-wrap td {
+  color: #d1d5db;
 }
 
 /* Safe area para iPhone con notch */

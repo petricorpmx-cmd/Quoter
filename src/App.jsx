@@ -4,17 +4,20 @@ import { useAuth } from './hooks/useAuth';
 import { useFirestore } from './hooks/useFirestore';
 import { useChat } from './hooks/useChat';
 import { useFavoriteProviders } from './hooks/useFavoriteProviders';
+import { useUsuariosSistema } from './hooks/useUsuariosSistema';
 import { Header } from './components/Header/Header';
 import { ProductItem } from './components/ProductItem/ProductItem';
 import { ChatSidebar } from './components/ChatSidebar/ChatSidebar';
 import { FavoriteProviders } from './components/FavoriteProviders/FavoriteProviders';
+import { UsuariosSistema } from './components/UsuariosSistema/UsuariosSistema';
 import { ConfirmDialog } from './components/ConfirmDialog/ConfirmDialog';
 import { Sidebar } from './components/Sidebar/Sidebar';
+import { Login } from './components/Login/Login';
 import { handleExportPDF } from './utils/exportPDF';
 import { handleExportExcel } from './utils/exportExcel';
 
 const App = () => {
-  const user = useAuth();
+  const { user, isLoading: isLoadingAuth, logout } = useAuth();
   const { items, setItems, ivaRate, setIvaRate, isSaving } = useFirestore(user);
   const {
     isChatOpen,
@@ -33,6 +36,15 @@ const App = () => {
     saveProvider,
     deleteProvider
   } = useFavoriteProviders(user);
+  
+  const {
+    usuarios,
+    isLoading: isLoadingUsuarios,
+    isSaving: isSavingUsuarios,
+    guardarUsuario,
+    actualizarUsuario,
+    eliminarUsuario
+  } = useUsuariosSistema(user);
   
   const [expandedItems, setExpandedItems] = useState([]);
   const [currentView, setCurrentView] = useState('analizador'); // 'analizador' o 'guardados'
@@ -184,6 +196,25 @@ const App = () => {
     }
   };
 
+  // Mostrar Login si no está autenticado
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative mx-auto w-16 h-16 mb-4">
+            <div className="absolute inset-0 border-4 border-blue-200 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+          </div>
+          <p className="text-slate-500 font-bold">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login onLoginSuccess={() => console.log('Login exitoso')} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 flex text-slate-900 font-sans relative safe-area-inset">
       {/* SIDEBAR LATERAL */}
@@ -217,6 +248,7 @@ const App = () => {
             isSaving={isSaving}
             onShowFavorites={() => setCurrentView('guardados')}
             showFavorites={currentView === 'guardados'}
+            onLogout={logout}
           />
 
           {currentView === 'guardados' ? (
@@ -252,6 +284,16 @@ const App = () => {
                   });
                 }}
                 isLoading={isLoadingFavorites}
+              />
+            </div>
+          ) : currentView === 'usuarios-sistema' ? (
+            <div className="animate-fade-in">
+              <UsuariosSistema
+                usuarios={usuarios}
+                isLoading={isLoadingUsuarios}
+                onSave={guardarUsuario}
+                onUpdate={actualizarUsuario}
+                onDelete={eliminarUsuario}
               />
             </div>
           ) : (

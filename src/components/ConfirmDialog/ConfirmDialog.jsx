@@ -69,16 +69,18 @@ export const ConfirmDialog = ({
           </p>
 
           {/* Actions */}
-          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 sm:px-6 py-3 sm:py-3.5 bg-slate-100 text-slate-700 font-black rounded-xl sm:rounded-2xl active:bg-slate-200 transition-all active:scale-98 touch-manipulation text-sm sm:text-base"
-            >
-              {cancelText}
-            </button>
+          <div className={`flex gap-3 sm:gap-3 ${cancelText ? 'flex-col-reverse sm:flex-row' : ''}`}>
+            {cancelText && (
+              <button
+                onClick={onClose}
+                className="flex-1 px-4 sm:px-6 py-3 sm:py-3.5 bg-slate-100 text-slate-700 font-black rounded-xl sm:rounded-2xl active:bg-slate-200 transition-all active:scale-98 touch-manipulation text-sm sm:text-base"
+              >
+                {cancelText}
+              </button>
+            )}
             <button
               onClick={handleConfirm}
-              className={`flex-1 px-4 sm:px-6 py-3 sm:py-3.5 font-black rounded-xl sm:rounded-2xl transition-all active:scale-98 touch-manipulation text-sm sm:text-base ${
+              className={`${cancelText ? 'flex-1' : 'w-full'} px-4 sm:px-6 py-3 sm:py-3.5 font-black rounded-xl sm:rounded-2xl transition-all active:scale-98 touch-manipulation text-sm sm:text-base ${
                 type === 'danger'
                   ? 'bg-gradient-to-r from-red-500 to-red-600 text-white active:from-red-600 active:to-red-700 shadow-lg shadow-red-200/50'
                   : type === 'warning'

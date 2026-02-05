@@ -70,27 +70,40 @@ try {
     authDomain: firebaseConfig.authDomain || 'VACÍO'
   });
   
+  // Validar que authDomain esté presente
+  if (!firebaseConfig.authDomain) {
+    console.error('❌ authDomain no está configurado');
+    throw new Error('authDomain es requerido para Firebase Auth');
+  }
+  
   // Intentar inicializar Firebase App
   try {
     app = initializeApp(firebaseConfig);
     console.log('✅ Firebase App inicializado');
   } catch (appError) {
     console.error('❌ Error inicializando Firebase App:', appError);
-    // Continuar intentando inicializar Auth y Firestore aunque App falle
+    throw appError; // Si App falla, no podemos continuar
   }
   
-  // Intentar inicializar Auth (puede fallar si apiKey es inválida, pero continuamos)
+  // Inicializar Auth - DEBE estar después de initializeApp
   try {
-    if (app) {
-      auth = getAuth(app);
-      console.log('✅ Firebase Auth inicializado');
+    if (!app) {
+      throw new Error('Firebase App no está disponible para inicializar Auth');
     }
+    auth = getAuth(app);
+    console.log('✅ Firebase Auth inicializado correctamente');
+    console.log('✅ Auth Domain:', firebaseConfig.authDomain);
+    console.log('✅ Auth disponible:', !!auth);
   } catch (authError) {
-    console.warn('⚠️ Error inicializando Firebase Auth (continuando sin auth):', authError.message);
-    // No bloqueamos la app si auth falla
+    console.error('❌ Error inicializando Firebase Auth:', authError);
+    console.error('❌ Código:', authError.code);
+    console.error('❌ Mensaje:', authError.message);
+    console.error('💡 SOLUCIÓN: Verifica que Firebase Authentication esté habilitado en Firebase Console');
+    console.error('💡 Ve a: https://console.firebase.google.com/project/' + firebaseConfig.projectId + '/authentication');
+    auth = null;
   }
   
-  // Intentar inicializar Firestore (esto es lo más importante)
+  // Intentar inicializar Firestore
   try {
     if (app) {
       db = getFirestore(app);
