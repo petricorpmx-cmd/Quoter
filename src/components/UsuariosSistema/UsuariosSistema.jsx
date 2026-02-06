@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Plus, Trash2, Edit2, Mail, Phone, Search, KeyRound } from 'lucide-react';
+import { Users, Plus, Trash2, Edit2, Mail, Phone, KeyRound } from 'lucide-react';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog';
 
 export const UsuariosSistema = ({ 
@@ -243,18 +243,13 @@ export const UsuariosSistema = ({
         </div>
 
         {/* Barra de búsqueda */}
-        <div className="relative">
-          {!searchTerm && (
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" size={18} strokeWidth={2} />
-          )}
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar por nombre, email, teléfono o rol..."
-            className={`form-input ${searchTerm ? 'pl-4' : 'pl-10'}`}
-          />
-        </div>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Buscar por nombre, email, teléfono o rol..."
+          className="form-input"
+        />
       </div>
 
       {/* Formulario Modal */}
