@@ -100,12 +100,20 @@ html, body {
 /* Formularios */
 .form-input {
   width: 100%;
-  padding: 0.5rem 0.75rem;
+  padding: 0.625rem 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 1rem; /* 16px evita zoom en iOS al enfocar */
   transition: all 150ms ease;
   outline: none;
+  -webkit-appearance: none;
+}
+
+@media (min-width: 768px) {
+  .form-input {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
 }
 
 .form-input:focus {

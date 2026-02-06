@@ -118,7 +118,7 @@ export const Proveedores = ({ proveedores, isLoading, onSave, onUpdate, onDelete
 
   if (isLoading) {
     return (
-      <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200/50 p-16 text-center animate-fade-in">
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200/50 p-8 sm:p-16 text-center animate-fade-in">
         <div className="relative mx-auto w-16 h-16 mb-6">
           <div className="absolute inset-0 border-4 border-blue-200 rounded-full"></div>
           <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
@@ -129,18 +129,18 @@ export const Proveedores = ({ proveedores, isLoading, onSave, onUpdate, onDelete
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="card">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in px-2 sm:px-0">
+      <div className="card p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-4 sm:mb-6">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
               Gestión de Proveedores
             </h2>
             <p className="text-gray-500 text-sm font-medium">
               Base de datos de proveedores
             </p>
           </div>
-          <button onClick={() => initForm()} className="btn btn-primary">
+          <button onClick={() => initForm()} className="btn btn-primary w-full sm:w-auto min-h-[44px] py-3 sm:py-2">
             <Plus size={18} strokeWidth={2} />
             <span>Agregar Proveedor</span>
           </button>
@@ -150,15 +150,15 @@ export const Proveedores = ({ proveedores, isLoading, onSave, onUpdate, onDelete
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Buscar por nombre, email, teléfono, website o usuario..."
+          placeholder="Buscar por nombre, email, teléfono..."
           className="form-input"
         />
       </div>
 
       {/* Modal Formulario */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="card max-w-md w-full my-8 animate-fade-in-scale">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto overscroll-contain">
+          <div className="card max-w-md w-full max-h-[90vh] overflow-y-auto my-0 sm:my-8 rounded-t-2xl sm:rounded-xl animate-fade-in-scale p-4 sm:p-6 safe-area-inset-bottom">
             <h3 className="text-xl font-bold text-gray-900 mb-4">
               {editingId ? 'Editar Proveedor' : 'Nuevo Proveedor'}
             </h3>
@@ -233,14 +233,14 @@ export const Proveedores = ({ proveedores, isLoading, onSave, onUpdate, onDelete
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
-                <button type="submit" className="btn btn-primary flex-1">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
+                <button type="submit" className="btn btn-primary flex-1 min-h-[44px] py-3">
                   {editingId ? 'Actualizar' : 'Guardar'}
                 </button>
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditingId(null); }}
-                  className="btn btn-secondary flex-1"
+                  className="btn btn-secondary flex-1 min-h-[44px] py-3"
                 >
                   Cancelar
                 </button>
@@ -250,31 +250,99 @@ export const Proveedores = ({ proveedores, isLoading, onSave, onUpdate, onDelete
         </div>
       )}
 
-      {/* Tabla */}
-      <div className="table-wrap">
+      {/* Contenido: Cards móvil / Tabla desktop */}
+      <div className="table-wrap overflow-hidden">
         {filteredProveedores.length === 0 ? (
-          <div className="p-16 text-center">
-            <div className="relative mx-auto w-32 h-32 mb-6">
+          <div className="p-8 sm:p-16 text-center">
+            <div className="relative mx-auto w-24 h-24 sm:w-32 sm:h-32 mb-4 sm:mb-6">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full blur-xl opacity-50"></div>
-              <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-full flex items-center justify-center">
-                <Truck size={48} className="text-blue-400" />
+              <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 p-6 sm:p-8 rounded-full flex items-center justify-center">
+                <Truck size={40} className="sm:w-12 sm:h-12 text-blue-400" />
               </div>
             </div>
-            <h3 className="text-xl font-black text-slate-900 mb-2">
+            <h3 className="text-lg sm:text-xl font-black text-slate-900 mb-2">
               {searchTerm ? 'No se encontraron proveedores' : 'No hay proveedores registrados'}
             </h3>
             <p className="text-slate-500 text-sm mb-6">
-              {searchTerm ? 'Intenta con otros términos de búsqueda' : 'Agrega tu primer proveedor'}
+              {searchTerm ? 'Intenta con otros términos' : 'Agrega tu primer proveedor'}
             </p>
             {!searchTerm && (
-              <button onClick={() => initForm()} className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700">
+              <button onClick={() => initForm()} className="px-6 py-3 min-h-[44px] bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 active:scale-98">
                 Agregar Proveedor
               </button>
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <>
+            {/* Cards para móvil */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {filteredProveedores.map((proveedor) => (
+                <div key={proveedor.id} className="p-4 hover:bg-gray-50/50 active:bg-gray-100 transition-colors">
+                  <div className="flex justify-between items-start gap-2 mb-3">
+                    <h3 className="font-bold text-slate-900 text-base truncate flex-1">{proveedor.nombre || 'N/A'}</h3>
+                    <div className="flex gap-1 flex-shrink-0">
+                      <button
+                        onClick={() => initForm(proveedor)}
+                        className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-amber-600 hover:bg-amber-50 rounded-lg active:scale-95"
+                        title="Editar"
+                      >
+                        <Edit2 size={20} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(proveedor.id, proveedor.nombre)}
+                        className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg active:scale-95"
+                        title="Eliminar"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-sm text-slate-600">
+                    {proveedor.email && (
+                      <div className="flex items-center gap-2">
+                        <Mail size={14} className="flex-shrink-0 text-gray-400" />
+                        <a href={`mailto:${proveedor.email}`} className="truncate text-blue-600">{proveedor.email}</a>
+                      </div>
+                    )}
+                    {proveedor.telefono && (
+                      <div className="flex items-center gap-2">
+                        <Phone size={14} className="flex-shrink-0 text-gray-400" />
+                        <a href={`tel:${proveedor.telefono}`} className="text-slate-700">{proveedor.telefono}</a>
+                      </div>
+                    )}
+                    {proveedor.website && (
+                      <div className="flex items-center gap-2">
+                        <Globe size={14} className="flex-shrink-0 text-gray-400" />
+                        <a href={proveedor.website.startsWith('http') ? proveedor.website : `https://${proveedor.website}`} target="_blank" rel="noopener noreferrer" className="truncate text-blue-600">Ver sitio</a>
+                      </div>
+                    )}
+                    {proveedor.usuario && (
+                      <div className="flex items-center gap-2">
+                        <User size={14} className="flex-shrink-0 text-gray-400" />
+                        <span className="truncate">{proveedor.usuario}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs">
+                        {visiblePasswords[proveedor.id] ? (proveedor.password || '—') : '••••••••'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => togglePasswordVisibility(proveedor.id)}
+                        className="p-2 min-w-[36px] min-h-[36px] text-gray-500 rounded"
+                        title={visiblePasswords[proveedor.id] ? 'Ocultar' : 'Mostrar'}
+                      >
+                        {visiblePasswords[proveedor.id] ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Tabla para desktop */}
+            <div className="hidden md:block overflow-x-auto -webkit-overflow-scrolling-touch">
+              <table className="w-full min-w-[700px]">
               <thead>
                 <tr>
                   <th>Nombre</th>
@@ -324,7 +392,7 @@ export const Proveedores = ({ proveedores, isLoading, onSave, onUpdate, onDelete
                         <button
                           type="button"
                           onClick={() => togglePasswordVisibility(proveedor.id)}
-                          className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+                          className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
                           title={visiblePasswords[proveedor.id] ? 'Ocultar' : 'Mostrar'}
                         >
                           {visiblePasswords[proveedor.id] ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -335,17 +403,17 @@ export const Proveedores = ({ proveedores, isLoading, onSave, onUpdate, onDelete
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => initForm(proveedor)}
-                          className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                          className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-amber-600 hover:bg-amber-50 rounded-lg transition-colors active:scale-95"
                           title="Editar"
                         >
-                          <Edit2 size={16} />
+                          <Edit2 size={18} />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(proveedor.id, proveedor.nombre)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors active:scale-95"
                           title="Eliminar"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </td>
@@ -353,7 +421,8 @@ export const Proveedores = ({ proveedores, isLoading, onSave, onUpdate, onDelete
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
       </div>
 
