@@ -278,6 +278,11 @@ body.nav-expanded {
   padding-right: env(safe-area-inset-right);
 }
 
+/* Scroll suave en iOS */
+.-webkit-overflow-scrolling-touch {
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Mejorar touch targets para móvil */
 .touch-manipulation {
   touch-action: manipulation;
