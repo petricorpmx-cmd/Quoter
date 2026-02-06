@@ -5,6 +5,7 @@ import {
   updateUsuario, 
   deleteUsuario 
 } from '../services/firebase/usuariosSistemaService';
+import { sendPasswordResetToUser } from '../services/firebase/authService';
 
 export const useUsuariosSistema = (user) => {
   const [usuarios, setUsuarios] = useState([]);
@@ -78,12 +79,26 @@ export const useUsuariosSistema = (user) => {
     }
   };
 
+  // Enviar correo de recuperación de contraseña (cuando el usuario olvidó su contraseña)
+  // skipVerification=true porque el admin está editando un usuario que ya existe
+  const enviarCorreoRecuperacion = async (email) => {
+    if (!user) return;
+    
+    try {
+      await sendPasswordResetToUser(email, true);
+    } catch (error) {
+      console.error('Error al enviar correo de recuperación:', error);
+      throw error;
+    }
+  };
+
   return {
     usuarios,
     isLoading,
     isSaving,
     guardarUsuario,
     actualizarUsuario,
-    eliminarUsuario
+    eliminarUsuario,
+    enviarCorreoRecuperacion
   };
 };

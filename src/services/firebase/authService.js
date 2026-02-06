@@ -5,7 +5,7 @@ import {
   sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from './config';
+import { app, auth, db } from './config';
 
 const ADMIN_EMAIL = 'Rolando.martinez@petricorp.com.mx';
 const ADMIN_PASSWORD = 'Rolando01M';
@@ -188,21 +188,33 @@ export const createUserWithTemporaryPassword = async (email, password, userData)
   }
 };
 
-// Cambiar contraseña de usuario
-export const changeUserPassword = async (email, newPassword) => {
+/**
+ * Enviar correo de recuperación de contraseña al usuario.
+ * Solo envía si el email está registrado en el sistema (verificación previa recomendada).
+ * Nota: Firebase no lanza error si el email no existe (por seguridad), por eso verificamos antes.
+ */
+export const sendPasswordResetToUser = async (email, skipVerification = false) => {
   if (!auth) {
     throw new Error('Firebase Auth no está disponible');
   }
 
+  if (!skipVerification) {
+    const { verificarEmailRegistrado } = await import('./usuariosSistemaService');
+    const registrado = await verificarEmailRegistrado(email);
+    if (!registrado) {
+      throw new Error('Este email no está registrado en el sistema. Contacta al administrador si necesitas acceso.');
+    }
+  }
+
   try {
-    // Para cambiar la contraseña, necesitamos que el usuario esté autenticado
-    // O usar Admin SDK en el backend
-    // Por ahora, usaremos sendPasswordResetEmail como alternativa
     await sendPasswordResetEmail(auth, email);
     return true;
   } catch (error) {
-    console.error('❌ Error al cambiar contraseña:', error);
-    throw error;
+    console.error('❌ Error al enviar correo de recuperación:', error);
+    if (error.code === 'auth/invalid-email') {
+      throw new Error('El formato del email no es válido.');
+    }
+    throw new Error(error.message || 'Error al enviar el correo de recuperación');
   }
 };
 

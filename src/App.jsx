@@ -17,7 +17,7 @@ import { handleExportPDF } from './utils/exportPDF';
 import { handleExportExcel } from './utils/exportExcel';
 
 const App = () => {
-  const { user, isLoading: isLoadingAuth, logout } = useAuth();
+  const { user, isLoading: isLoadingAuth, logout, authError } = useAuth();
   const { items, setItems, ivaRate, setIvaRate, isSaving } = useFirestore(user);
   const {
     isChatOpen,
@@ -43,7 +43,8 @@ const App = () => {
     isSaving: isSavingUsuarios,
     guardarUsuario,
     actualizarUsuario,
-    eliminarUsuario
+    eliminarUsuario,
+    enviarCorreoRecuperacion
   } = useUsuariosSistema(user);
   
   const [expandedItems, setExpandedItems] = useState([]);
@@ -212,7 +213,7 @@ const App = () => {
   }
 
   if (!user) {
-    return <Login onLoginSuccess={() => console.log('Login exitoso')} />;
+    return <Login onLoginSuccess={() => console.log('Login exitoso')} authError={authError} />;
   }
 
   return (
@@ -294,6 +295,7 @@ const App = () => {
                 onSave={guardarUsuario}
                 onUpdate={actualizarUsuario}
                 onDelete={eliminarUsuario}
+                onSendPasswordReset={enviarCorreoRecuperacion}
               />
             </div>
           ) : (

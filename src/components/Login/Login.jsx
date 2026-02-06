@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
-import { LogIn, Mail, Lock, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { LogIn, Mail, Lock, AlertCircle, Loader2, Eye, EyeOff, KeyRound } from 'lucide-react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../services/firebase/config';
+import { sendPasswordResetToUser } from '../../services/firebase/authService';
 
-export const Login = ({ onLoginSuccess }) => {
+export const Login = ({ onLoginSuccess, authError: propAuthError }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetError, setResetError] = useState('');
+
+  // Mostrar error de autenticación si viene del hook
+  useEffect(() => {
+    if (propAuthError) {
+      setError(propAuthError);
+    }
+  }, [propAuthError]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,6 +74,26 @@ export const Login = ({ onLoginSuccess }) => {
       setError(errorMessage);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+    setResetError('');
+    setResetSuccess(false);
+    if (!resetEmail.trim()) {
+      setResetError('Ingresa tu email');
+      return;
+    }
+    setResetLoading(true);
+    try {
+      await sendPasswordResetToUser(resetEmail.trim());
+      setResetSuccess(true);
+      setResetEmail('');
+    } catch (err) {
+      setResetError(err.message || 'Error al enviar el correo');
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -169,11 +202,72 @@ export const Login = ({ onLoginSuccess }) => {
             </button>
           </form>
 
-          {/* Información adicional */}
+          {/* Restablecer contraseña */}
           <div className="mt-6 pt-6 border-t border-slate-200">
-            <p className="text-xs text-slate-500 text-center">
-              Si olvidaste tu contraseña, contacta al administrador del sistema
-            </p>
+            {!showResetForm ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowResetForm(true);
+                  setResetError('');
+                  setResetSuccess(false);
+                  setResetEmail('');
+                }}
+                className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center justify-center gap-2 py-1"
+              >
+                <KeyRound size={16} />
+                ¿Olvidaste tu contraseña?
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-slate-700 font-medium">
+                  Ingresa tu email para recibir un enlace de recuperación:
+                </p>
+                <form onSubmit={handlePasswordReset} className="space-y-2">
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="tu@email.com"
+                    className="form-input text-sm"
+                    disabled={resetLoading}
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      type="submit"
+                      disabled={resetLoading}
+                      className="btn btn-primary flex-1 py-2 text-sm"
+                    >
+                      {resetLoading ? (
+                        <Loader2 size={16} className="animate-spin mx-auto" />
+                      ) : (
+                        'Enviar correo'
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowResetForm(false);
+                        setResetEmail('');
+                        setResetError('');
+                        setResetSuccess(false);
+                      }}
+                      className="btn btn-secondary py-2 text-sm"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+                {resetSuccess && (
+                  <p className="text-xs text-emerald-600 font-medium">
+                    ✅ Revisa tu correo. Te enviamos un enlace para restablecer tu contraseña.
+                  </p>
+                )}
+                {resetError && (
+                  <p className="text-xs text-red-600 font-medium">{resetError}</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

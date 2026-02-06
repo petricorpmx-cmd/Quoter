@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Plus, Trash2, Edit2, Mail, Phone, User, Calendar, Search, AlertCircle } from 'lucide-react';
+import { Users, Plus, Trash2, Edit2, Mail, Phone, Search, KeyRound } from 'lucide-react';
 import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog';
 
 export const UsuariosSistema = ({ 
@@ -7,7 +7,8 @@ export const UsuariosSistema = ({
   isLoading, 
   onSave, 
   onUpdate, 
-  onDelete 
+  onDelete,
+  onSendPasswordReset
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState(null);
@@ -22,6 +23,8 @@ export const UsuariosSistema = ({
   const [showForm, setShowForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [createdPassword, setCreatedPassword] = useState(null);
+  const [sendingResetEmail, setSendingResetEmail] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   
   // Estado para el diálogo de confirmación
   const [confirmDialog, setConfirmDialog] = useState({
@@ -66,6 +69,7 @@ export const UsuariosSistema = ({
       setEditingId(usuario.id);
       setShowPassword(false);
       setCreatedPassword(null);
+      setResetEmailSent(false);
     } else {
       setFormData({
         nombre: '',
@@ -87,10 +91,8 @@ export const UsuariosSistema = ({
     e.preventDefault();
     try {
       if (editingId) {
-        // Al editar, no cambiamos la contraseña
+        // Al editar, no incluimos la contraseña (se usa "Enviar correo de recuperación" en su lugar)
         const { password, ...dataToUpdate } = formData;
-        
-        // Si es el administrador, agregar el flag isDefaultAdmin
         if (editingId === 'admin-default') {
           dataToUpdate.isDefaultAdmin = true;
         }
@@ -157,6 +159,27 @@ export const UsuariosSistema = ({
         title: editingId ? 'Error al actualizar usuario' : 'Error al guardar usuario',
         message: errorMessage
       });
+    }
+  };
+
+  // Enviar correo de recuperación de contraseña
+  const handleSendPasswordReset = async (e) => {
+    e.preventDefault();
+    if (!formData.email || !onSendPasswordReset) return;
+    
+    setSendingResetEmail(true);
+    setResetEmailSent(false);
+    try {
+      await onSendPasswordReset(formData.email);
+      setResetEmailSent(true);
+    } catch (error) {
+      setErrorDialog({
+        isOpen: true,
+        title: 'Error al enviar correo',
+        message: error.message || 'No se pudo enviar el correo de recuperación.'
+      });
+    } finally {
+      setSendingResetEmail(false);
     }
   };
 
@@ -276,7 +299,7 @@ export const UsuariosSistema = ({
                   className="form-input"
                 />
               </div>
-              {!editingId && (
+              {!editingId ? (
                 <div>
                   <label className="form-label">
                     Contraseña Temporal <span className="text-xs text-gray-400 font-normal">(se generará automáticamente si se deja vacío)</span>
@@ -288,6 +311,26 @@ export const UsuariosSistema = ({
                     placeholder="Dejar vacío para generar automáticamente"
                     className="form-input"
                   />
+                </div>
+              ) : (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm font-medium text-amber-800 mb-2">
+                    ¿El usuario olvidó su contraseña?
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleSendPasswordReset}
+                    disabled={sendingResetEmail || !formData.email}
+                    className="btn btn-secondary w-full text-sm flex items-center justify-center gap-2"
+                  >
+                    <KeyRound size={16} />
+                    {sendingResetEmail ? 'Enviando...' : 'Enviar correo de recuperación'}
+                  </button>
+                  {resetEmailSent && (
+                    <p className="text-xs text-emerald-700 mt-2 font-medium">
+                      ✅ Correo enviado. El usuario recibirá un enlace para restablecer su contraseña.
+                    </p>
+                  )}
                 </div>
               )}
               <div>
@@ -316,7 +359,7 @@ export const UsuariosSistema = ({
                   Usuario Activo
                 </label>
               </div>
-              {/* Mostrar contraseña generada */}
+              {/* Mostrar contraseña generada al crear usuario */}
               {createdPassword && (
                 <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
                   <p className="text-sm font-bold text-blue-900 mb-2">

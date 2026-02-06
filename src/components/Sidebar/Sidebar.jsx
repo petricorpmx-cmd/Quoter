@@ -12,6 +12,12 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
       icon: Calculator,
       submenu: [
         {
+          id: 'analizador',
+          label: 'Analizador',
+          icon: Calculator,
+          parent: 'analizador'
+        },
+        {
           id: 'guardados',
           label: 'Guardados',
           icon: Star,
@@ -167,13 +173,20 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
                     <button
                       onClick={() => {
                         if (item.submenu && item.submenu.length > 0) {
-                          // Si tiene submenú, toggle el acordeón
+                          // Si tiene submenú, navegar al primer item (analizador) y toggle el acordeón
                           if (!isCollapsed) {
                             toggleSubmenu(item.id);
+                            // Si es Analizador Pro, navegar al analizador al hacer clic
+                            if (item.id === 'analizador') {
+                              handleViewChange('analizador');
+                            }
                           } else {
-                            // Si está colapsado, expandir sidebar y abrir submenú
+                            // Si está colapsado, expandir sidebar, abrir submenú y navegar
                             setIsCollapsed(false);
                             setOpenSubmenu(item.id);
+                            if (item.id === 'analizador') {
+                              handleViewChange('analizador');
+                            }
                           }
                         } else {
                           // Si no tiene submenú, navegar directamente
