@@ -5,11 +5,13 @@ import { useFirestore } from './hooks/useFirestore';
 import { useChat } from './hooks/useChat';
 import { useFavoriteProviders } from './hooks/useFavoriteProviders';
 import { useUsuariosSistema } from './hooks/useUsuariosSistema';
+import { useProveedores } from './hooks/useProveedores';
 import { Header } from './components/Header/Header';
 import { ProductItem } from './components/ProductItem/ProductItem';
 import { ChatSidebar } from './components/ChatSidebar/ChatSidebar';
 import { FavoriteProviders } from './components/FavoriteProviders/FavoriteProviders';
 import { UsuariosSistema } from './components/UsuariosSistema/UsuariosSistema';
+import { Proveedores } from './components/Proveedores/Proveedores';
 import { ConfirmDialog } from './components/ConfirmDialog/ConfirmDialog';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { Login } from './components/Login/Login';
@@ -46,6 +48,14 @@ const App = () => {
     eliminarUsuario,
     enviarCorreoRecuperacion
   } = useUsuariosSistema(user);
+  
+  const {
+    proveedores,
+    isLoading: isLoadingProveedores,
+    guardarProveedor,
+    actualizarProveedor: actualizarProveedorDB,
+    eliminarProveedor: eliminarProveedorDB
+  } = useProveedores(user);
   
   const [expandedItems, setExpandedItems] = useState([]);
   const [currentView, setCurrentView] = useState('analizador'); // 'analizador' o 'guardados'
@@ -285,6 +295,16 @@ const App = () => {
                   });
                 }}
                 isLoading={isLoadingFavorites}
+              />
+            </div>
+          ) : currentView === 'proveedores' ? (
+            <div className="animate-fade-in">
+              <Proveedores
+                proveedores={proveedores}
+                isLoading={isLoadingProveedores}
+                onSave={guardarProveedor}
+                onUpdate={actualizarProveedorDB}
+                onDelete={eliminarProveedorDB}
               />
             </div>
           ) : currentView === 'usuarios-sistema' ? (

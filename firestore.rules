@@ -2,6 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    // Reglas para el módulo Compras - Proveedores
+    match /modules/compras/proveedores/{proveedorId} {
+      allow read, write: if request.auth != null;
+    }
+    
     // Reglas para el módulo de administración de sistema - Usuarios (colección compartida)
     match /modules/administracion-sistema/usuarios/{usuarioId} {
       // Permitir lectura y escritura a cualquier usuario autenticado (todos los admins pueden gestionar usuarios)

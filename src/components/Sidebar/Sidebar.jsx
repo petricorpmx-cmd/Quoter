@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, Star, Settings, Users, ChevronLeft, Menu, X } from 'lucide-react';
+import { Calculator, Star, Settings, Users, Truck, ShoppingCart, ChevronLeft, Menu, X } from 'lucide-react';
 
 export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapsed, setIsCollapsed }) => {
   // Estado para controlar qué submenú está abierto (solo uno a la vez - acordeón)
@@ -22,6 +22,19 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
           label: 'Guardados',
           icon: Star,
           parent: 'analizador'
+        }
+      ]
+    },
+    {
+      id: 'compras',
+      label: 'Compras',
+      icon: ShoppingCart,
+      submenu: [
+        {
+          id: 'proveedores',
+          label: 'Proveedores',
+          icon: Truck,
+          parent: 'compras'
         }
       ]
     },
@@ -176,17 +189,13 @@ export const Sidebar = ({ isOpen, onClose, currentView, onViewChange, isCollapse
                           // Si tiene submenú, navegar al primer item (analizador) y toggle el acordeón
                           if (!isCollapsed) {
                             toggleSubmenu(item.id);
-                            // Si es Analizador Pro, navegar al analizador al hacer clic
-                            if (item.id === 'analizador') {
-                              handleViewChange('analizador');
-                            }
+                            if (item.id === 'analizador') handleViewChange('analizador');
+                            if (item.id === 'compras') handleViewChange('proveedores');
                           } else {
-                            // Si está colapsado, expandir sidebar, abrir submenú y navegar
                             setIsCollapsed(false);
                             setOpenSubmenu(item.id);
-                            if (item.id === 'analizador') {
-                              handleViewChange('analizador');
-                            }
+                            if (item.id === 'analizador') handleViewChange('analizador');
+                            if (item.id === 'compras') handleViewChange('proveedores');
                           }
                         } else {
                           // Si no tiene submenú, navegar directamente
